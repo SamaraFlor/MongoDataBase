@@ -1,0 +1,391 @@
+
+db.createCollection("clientes",
+      {
+           validator:{
+                $jsonSchema:{
+                    bsonType: "object",
+                    required:[ "nome", "cpf", "status_civil", "data_nascimento", "endereco"],
+                    properties:{
+                        nome:{
+                            bsonType: "string",
+                            description: "informe corretamente o nome do cliente"
+                        },
+                        cpf:{
+                            bsonType: "string",
+                            description: "informe corretamente o cpf do cliente"
+                        },
+                        status_civil:{
+                            bsonType: "string",
+                            enum:["Solteiro(a)", "Casado(a)", "Separado(a)", "Divorciado(a)", "Viúvo(a)"],
+                            description: "informe corretamente o status civil do cliente"
+                        },
+                        data_nascimento:{
+                            bsonType: "string",
+                            description: "informe corretamente a data de nascimento do cliente"
+                        },
+                        endereco:{
+                            bsonType: "string",
+                            description: "informe corretamente o endereço do cliente"
+                        }
+                }
+            }              
+        }
+    }
+)
+
+
+
+
+db.createCollection("contas",
+{
+   validator:{
+          $jsonSchema:{
+                bsonType:"object",
+                    required:["Numero_da_Conta", "Tipo", "CPF"],
+                    properties:{
+                       Numero_Conta:{
+                             bsonType: "string",
+                                 description: "informe corretamente o numero da conta"
+                         },
+                         Tipo:{
+                             bsonType: "string",
+                             enum:["Conta corrente", "Conta poupança", "Conta salário"],
+                                 description: "informe corretamente o tipo da conta"
+                         },
+                         CPF:{
+                             bsonType: "string",
+                                 description: "informe corretamente o cpf do cliente na conta"
+
+
+                         }
+                    }
+           }
+     }
+
+
+//Com a palavra chave enum, podemos definir os possíveis valores que um campo poderá receber.
+
+
+
+db.clientes.insertMany([{
+"nome": "Juliana Eloá Brito", 
+ "cpf": "208.862.381-70",
+ "data_nascimento": "26/06/1991", 
+ "genero": "Feminino", 
+ "profissao": "Trabalhador de serviços de limpeza", 
+ "endereco": "Rua Euza D'Aparecida Roriz dos Anjos, número 617, Setor Leste, Luziânia, GO, 72803-590", 
+ "status_civil": "Solteiro(a)"
+},{
+"nome": "Luan Caio da Silva", 
+ "cpf": "520.233.763-94", 
+ "data_nascimento": "14/10/1949", 
+ "genero": "Masculino", 
+ "profissao": "Atendente de farmácia", 
+ "endereco": "Rua João Alberto, número 224, Santa Clara, São Luís, MA, 65058-623", 
+ "status_civil": "Viúvo(a)" }])
+
+ db.contas.insertMany([{
+"Numero_Conta": "0189393-9", 
+"Agência": "0289", 
+"Tipo": "Conta salário",
+ "CPF": "208.862.381-70", 
+"Valor": 5242
+}, {
+"Numero_Conta": "67314-4", 
+"Agência": "7147", 
+"Tipo": "Conta poupança", 
+"CPF": "520.233.763-94"}])
+
+//procurar
+db.getCollectionInfos({name:"clientes"})
+db.getCollectionInfos({name:"contas"})
+
+
+//db.runCommand(), que é um método. Nas chaves, passaremos o comando listCollections. 
+//Queremos retornar uma coleção por vez. Também passaremos um filtro e, mais uma vez, o name.
+
+db.runCommand({listCollections: 1, filter:{name: "contas"}})
+db.runCommand({listCollections: 2})
+
+//alterando
+db.runCommand({collMod:"clientes", })
+
+db.runCommand( { collMod: "clientes",
+  validator:{
+    $jsonSchema: {
+      bsonType: "object",
+      required: [ "nome", "cpf",  "status_civil", "data_nascimento", "endereco" ],
+      properties: {
+         nome: {
+            bsonType: "string",
+            maxLength: 150,
+            description: "informe corretamente o nome do cliente"
+         },
+         cpf: {
+            bsonType: "string",
+            minLength:14,
+            maxLength: 14,
+            description: "informe corretamente o cpf do cliente"
+
+         },
+          status_civil: {
+            enum: [ "Solteiro(a)", "Casado(a)", "Separado(a)", "Divorciado(a)", "Viúvo(a)" ],
+            description: "informe corretamente o status civil do cliente"
+                     },
+         data_nascimento: {
+            bsonType: "string",
+            description: "informe corretamente a data de nascimento do cliente"
+         },
+         endereco: {
+            bsonType: "string",
+            description: "informe corretamente o endereço do cliente"
+                  }
+            }
+          }
+      }
+})
+
+
+    
+
+db.runCommand( { collMod: "contas",
+     validator:{
+          $jsonSchema: {
+            bsonType: "object",
+            required: [ "Numero_Conta", "Tipo", "CPF"],
+            properties: {
+               "Numero_Conta": {
+                  bsonType: "string",
+                  description: "Informe corretamente o numero da conta"
+               },
+               Tipo: {
+                  enum: [ "Conta corrente", "Conta poupança", "Conta salário" ],
+                  description: "informe corretamente o tipo da conta"
+               },
+               CPF: {
+                  bsonType: "string" ,
+                  description: "informe corretamente o cpf do cliente na conta",
+               },
+                  Valor: {
+                  bsonType: "double" ,  
+                  description: "informe corretamente o cpf do cliente na conta"
+
+               }
+            }
+          }
+      }
+})
+
+
+// inserindo 
+db.clientes.insert({"nome": "Emanuelly Raquel Peixoto", 
+ "cpf": "587.179.508-05", 
+ "data_nascimento": "24/05/1966", 
+ "genero": "Feminino", 
+ "profissao": "Gerente de loja", 
+ "endereco": "Rua São Bento Abade, número 833, Jardim Marilena, Guarulhos, SP, 07140-450", 
+ "status_civil": "Viúvo(a)"})
+
+
+//validações
+
+db.runCommand( { collMod: "clientes",
+  validator:{
+    $jsonSchema: {
+      bsonType: "object",
+            "additionalProperties": false,
+      required: [ "nome", "cpf",  "status_civil", "data_nascimento", "endereco" ],
+      properties: {
+         nome: {
+            bsonType: "string",
+            description: "informe corretamente o nome do cliente"
+  
+
+  db.runCommand({collMod:"contas",
+     validator:{
+        $jsonSchema:{
+            bsonType:"object",
+            "additionalProperties": false,
+            required:["_id","Numero_Conta", "Tipo", "CPF", "Valor","Agência"],
+            properties:{
+                _id:{
+                          bsonType: "objectId",
+                          description: "informe corretamente o endereço do cliente" 
+                      },
+               Numero_Conta:{
+                   bsonType: "string",
+                   description: "informe corretamente o numero da conta"
+               },
+               Tipo:{
+                   bsonType: "string",
+                   enum:["Conta corrente", "Conta poupança", "Conta salário"],
+                   description: "informe corretamente o tipo da conta"
+               },
+               CPF:{
+                   bsonType: "string",
+                   minLength:14,
+                   maxLength:14,
+                   description: "informe corretamente o cpf do cliente na conta"
+               },
+               Valor:{
+                   bsonType: "double",
+                   description: "informe corretamente o valor da conta"
+               },
+               Agência:{
+                   bsonType: "string",
+                   description: "informe corretamente a Agência"}
+            }
+        }
+    }
+})
+
+db.getCollectionInfos( { name: "contas" } )
+db.contas.find()
+db.contas.updateOne({CPF: 426.239.660-23}, {$set: {"Valor":1411}})// alterar valor
+
+//níveis de validação
+//moderate
+// strict  - As regras de validação são aplicadas a todas as inserções e atualizações nas coleções
+
+
+//validationAction
+
+db.runCommand({collMod:"contas",
+     validator:{
+        $jsonSchema:{
+            bsonType:"object",
+            "additionalProperties": false,
+            required:["_id","Numero_Conta", "Tipo", "CPF", "Valor","Agência"],
+            properties:{
+                _id:{
+                          bsonType: "objectId",
+                          description: "informe corretamente o endereço do cliente" 
+                      },
+               Numero_Conta:{
+                   bsonType: "string",
+                   description: "informe corretamente o numero da conta"
+               },
+               Tipo:{
+                   bsonType: "string",
+                   enum:["Conta corrente", "Conta poupança", "Conta salário"],
+                   description: "informe corretamente o tipo da conta"
+               },
+               CPF:{
+                   bsonType: "string",
+                   minLength:14,
+                   maxLength:14,
+                   description: "informe corretamente o cpf do cliente na conta"
+               },
+  },
+     Valor:{
+         bsonType: "double",
+             description: "informe corretamente o valor da conta"
+     }, 
+     Agência:{
+         bsonType: "string",
+             description: "informe corretamente a Agência"}
+         }
+     }
+ },
+
+ validationAction: "warn"
+
+})
+
+//quais são as duas ações de validação existentes?
+
+//Error é a ação padrão de validação do MongoDB e rejeita qualquer documento que viole os 
+//critérios de validação, assim como atualizações.
+
+
+//warn Ao utilizar ação de validação warn toda operação de inserção e atualização 
+//de documentos serão permitidas e as operações que violam as regras, serão registradas no log do MongoDB.
+
+
+//colocando na variavel
+
+
+db.clientes.find({})
+   .projection({})
+     .sort({_id:-1})
+     .limit(100)
+
+
+let clientes = 
+ {
+   $jsonSchema:{
+      bsonType: "object",
+      "additionalProperties": false,
+      required:["_id", "nome", "cpf","status_civil","data_nascimento","endereco", "genero", "profissao"],
+      properties:{
+           _id:{
+              bsonType: "objectId",
+              description: "informe corretamente o endereço do cliente" 
+          },
+          nome:{
+              bsonType: "string",
+              maxLength:150,
+              description: "informe corretamente o nome do cliente"
+          },
+          cpf:{
+             bsonType: "string",
+              minLength:14,
+              maxLength:14,
+             description: "informe corretamente o cpf do cliente" 
+          },
+          status_civil:{
+              bsonType: "string",
+              enum:["Solteiro(a)", "Casado(a)", "Separado(a)", "Divorciado(a)", "Viúvo(a)" ],
+              description: "informe corretamente o status civil do cliente" 
+          },
+          data_nascimento:{
+             bsonType: ["string", "null"],
+             description: "informe corretamente a data de nascimento do cliente"  
+          },
+          endereco:{
+              bsonType: "string",
+              description: "informe corretamente o endereço do cliente" 
+          },
+           genero:{
+              bsonType: "string",
+              description: "informe corretamente o genero do cliente" 
+          },
+           profissao:{
+              bsonType: "string",
+              description: "informe corretamente o profissão do cliente" 
+          }
+      }
+
+  }
+ } 
+
+// pesquisando pela variavel 
+//apenas os documentos que estão de acordo com a regra de validação
+db.clientes.find(clientes)
+
+//retornar o inverso: quem não está de acordo com as regras.
+//passaremos o $nor mais uma vez. Assim, visualizaremos apenas os 
+//documentos que estejam diferentes e um único documento será removido.
+db.clientes.deleteOne({$nor: [clientes]})
+
+
+db.clientes.find({$nor: [clientes]})
+
+// ignorando as regras de validação
+db.runCommand({inser: "contas"})
+
+
+//passaremos o comando que vai ignorar as regras de validação: bypassDocumentValidation: true
+db.runCommand( { insert:"contas"
+                documents: [{"Número da Conta": "48495901-2", 
+                "Agência": "2132", 
+                "Tipo": "conta corrente", 
+                "CPF": "936.261.726-94", 
+                "Valor": 2366}],
+          bypassDocumentValidation: true
+})
+
+//Utilizando bypassDocumentValidation é possível inserir documentos inválidos, 
+//sem alterar diretamente as informações na regra de validação.
+
+
